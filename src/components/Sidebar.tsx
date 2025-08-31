@@ -20,56 +20,60 @@ export function Sidebar({
   onOpenSettings,
 }: SidebarProps) {
   return (
-    <div className="w-64 bg-gray-900 dark:bg-gray-800 flex flex-col h-full text-white"> {/* Dark theme for sidebar */}
+    <div className="w-64 bg-gray-900 flex flex-col h-full">
       {/* Header */}
       <div className="p-4 border-b border-gray-700">
         <div className="flex items-center gap-2 mb-4">
-          <Bot className="w-6 h-6 text-blue-400" /> {/* Using Bot icon for the app logo */}
-          <h1 className="text-lg font-semibold">AI Tutor</h1> {/* Changed title */}
+          <Bot className="w-6 h-6 text-blue-400" />
+          <h1 className="text-lg font-semibold text-white">AI Tutor</h1>
         </div>
         <button
           onClick={onNewConversation}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors text-white shadow-sm"
+          className="w-full flex items-center gap-2 px-3 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors text-white border border-gray-600"
         >
           <Plus className="w-4 h-4" />
-          New Chat
+          New chat
         </button>
       </div>
 
       {/* Conversations */}
-      <div className="flex-1 overflow-y-auto p-2 space-y-1">
-        {conversations.length === 0 ? (
-          <div className="text-center text-gray-500 mt-8 px-4">
-            <MessageSquare className="w-8 h-8 mx-auto mb-2 text-gray-600" />
-            <p className="text-sm">No chats yet</p> {/* Changed text */}
-          </div>
-        ) : (
-          conversations.map((conversation) => (
-            <div
-              key={conversation.id}
-              className={`group flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors ${
-                currentConversationId === conversation.id
-                  ? 'bg-gray-800 text-white' // Highlight current conversation
-                  : 'hover:bg-gray-800 text-gray-300'
-              }`}
-              onClick={() => onSelectConversation(conversation.id)}
-            >
-              <MessageSquare className="w-4 h-4 flex-shrink-0 text-gray-400" />
-              <span className="flex-1 text-sm truncate">
-                {conversation.title}
-              </span>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDeleteConversation(conversation.id);
-                }}
-                className="opacity-0 group-hover:opacity-100 p-1 text-gray-500 hover:text-red-400 transition-all"
-              >
-                <Trash2 className="w-3 h-3" />
-              </button>
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-2">
+          {conversations.length === 0 ? (
+            <div className="text-center text-gray-500 mt-8 px-4">
+              <MessageSquare className="w-8 h-8 mx-auto mb-2 text-gray-600" />
+              <p className="text-sm">No conversations yet</p>
             </div>
-          ))
-        )}
+          ) : (
+            <div className="space-y-1">
+              {conversations.map((conversation) => (
+                <div
+                  key={conversation.id}
+                  className={`group flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors ${
+                    currentConversationId === conversation.id
+                      ? 'bg-gray-800'
+                      : 'hover:bg-gray-800'
+                  }`}
+                  onClick={() => onSelectConversation(conversation.id)}
+                >
+                  <MessageSquare className="w-4 h-4 flex-shrink-0 text-gray-400" />
+                  <span className="flex-1 text-sm text-gray-300 truncate">
+                    {conversation.title}
+                  </span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteConversation(conversation.id);
+                    }}
+                    className="opacity-0 group-hover:opacity-100 p-1 hover:text-red-400 transition-all"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Settings */}
