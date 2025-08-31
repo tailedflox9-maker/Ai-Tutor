@@ -9,9 +9,10 @@ import { Message } from '../types';
 interface MessageBubbleProps {
   message: Message;
   isStreaming?: boolean;
+  model?: 'google' | 'zhipu'; // Add model prop
 }
 
-export function MessageBubble({ message, isStreaming = false }: MessageBubbleProps) {
+export function MessageBubble({ message, isStreaming = false, model }: MessageBubbleProps) {
   const isUser = message.role === 'user';
   const [copied, setCopied] = React.useState(false);
 
@@ -29,7 +30,7 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
         </div>
       )}
       <div
-        className={`max-w-[80%] p-3 rounded-lg ${isUser ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-800'}`}
+        className={`max-w-[80%] p-3 rounded-lg ${isUser ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-800 font-normal'}`}
       >
         <div className="prose prose-sm max-w-none">
           <ReactMarkdown
@@ -53,12 +54,30 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
                   </code>
                 );
               },
+              table({ children }) {
+                return (
+                  <div className="overflow-x-auto my-4">
+                    <table className="border-collapse border border-gray-300 w-full">{children}</table>
+                  </div>
+                );
+              },
+              th({ children }) {
+                return <th className="border border-gray-300 p-2 bg-gray-100">{children}</th>;
+              },
+              td({ children }) {
+                return <td className="border border-gray-300 p-2">{children}</td>;
+              },
             }}
           >
             {message.content}
           </ReactMarkdown>
           {isStreaming && <span className="inline-block w-2 h-2 bg-blue-500 rounded-full animate-pulse ml-1"></span>}
         </div>
+        {!isUser && model && (
+          <div className="text-xs text-gray-500 mt-1">
+            {model === 'google' ? 'Google Gemini' : 'ZhipuAI'}
+          </div>
+        )}
       </div>
       {isUser && (
         <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-blue-500">
