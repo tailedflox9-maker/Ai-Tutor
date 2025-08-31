@@ -43,13 +43,13 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
           onKeyDown={handleKeyDown}
           placeholder={disabled ? "Please configure API keys in Settings first..." : "Send a message..."}
           disabled={disabled || isLoading}
-          className="w-full min-h-[52px] max-h-[200px] p-4 pr-12 bg-[var(--color-card)] border border-[var(--color-border)] rounded-xl resize-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent disabled:bg-gray-800 disabled:text-[var(--color-text-secondary)] shadow-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)]"
+          className="w-full min-h-[52px] max-h-[200px] p-4 pr-12 border border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500 shadow-sm"
           rows={1}
         />
         <button
           type="submit"
           disabled={!input.trim() || isLoading || disabled}
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/10 disabled:text-[var(--color-text-secondary)] disabled:cursor-not-allowed transition-colors rounded-lg"
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-blue-600 hover:text-blue-700 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors rounded-lg hover:bg-blue-50"
         >
           {isLoading ? (
             <Loader2 className="w-5 h-5 animate-spin" />
@@ -58,8 +58,9 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
           )}
         </button>
       </form>
+      
       {disabled && (
-        <p className="text-xs text-[var(--color-text-secondary)] mt-2 text-center">
+        <p className="text-xs text-gray-500 mt-2 text-center">
           Configure your API keys in Settings to start chatting
         </p>
       )}
