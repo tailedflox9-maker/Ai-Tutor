@@ -2,7 +2,7 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'; // Using a dark theme for code blocks
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { User, Bot, Copy, Check } from 'lucide-react';
 import { Message } from '../types';
 
@@ -22,10 +22,10 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
   };
 
   return (
-    <div className={`py-6 ${isUser ? '' : 'bg-gray-50 dark:bg-gray-800'}`}> {/* Dark theme for AI messages */}
+    <div className={`group py-6 ${isUser ? '' : 'bg-gray-50'}`}>
       <div className="flex gap-4 max-w-full">
         <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-          isUser ? 'bg-blue-600' : 'bg-gray-700 dark:bg-gray-700' // Dark theme for AI avatar
+          isUser ? 'bg-blue-600' : 'bg-gray-700'
         }`}>
           {isUser ? (
             <User className="w-4 h-4 text-white" />
@@ -33,16 +33,16 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
             <Bot className="w-4 h-4 text-white" />
           )}
         </div>
-
+        
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-sm font-medium text-gray-900 dark:text-white">
+            <span className="text-sm font-medium text-gray-900">
               {isUser ? 'You' : 'AI Tutor'}
             </span>
             {!isUser && (
               <button
                 onClick={handleCopy}
-                className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-all"
+                className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-gray-600 transition-all"
                 title="Copy message"
               >
                 {copied ? (
@@ -53,12 +53,12 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
               </button>
             )}
           </div>
-
-          <div className="prose prose-sm max-w-none text-gray-800 dark:text-gray-300"> {/* Dark theme text */}
+          
+          <div className="prose prose-sm max-w-none">
             {isUser ? (
-              <p className="m-0 whitespace-pre-wrap">{message.content}</p>
+              <p className="text-gray-800 whitespace-pre-wrap m-0">{message.content}</p>
             ) : (
-              <div>
+              <div className="text-gray-800">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
@@ -66,7 +66,7 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
                       const match = /language-(\w+)/.exec(className || '');
                       return !inline && match ? (
                         <SyntaxHighlighter
-                          style={oneDark} // Use the dark theme for code blocks
+                          style={oneDark}
                           language={match[1]}
                           PreTag="div"
                           className="rounded-md !mt-2 !mb-2"
@@ -75,24 +75,23 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
                           {String(children).replace(/\n$/, '')}
                         </SyntaxHighlighter>
                       ) : (
-                        <code className="bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
+                        <code className="bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
                           {children}
                         </code>
                       );
                     },
-                    // Add more custom components for markdown elements if needed, e.g., headings, lists
                     p: ({ children }) => <p className="mb-3 last:mb-0">{children}</p>,
-                    ul: ({ children }) => <ul className="mb-3 list-disc pl-6 last:mb-0">{children}</ul>,
-                    ol: ({ children }) => <ol className="mb-3 list-decimal pl-6 last:mb-0">{children}</ol>,
-                    h1: ({ children }) => <h1 className="text-2xl font-bold mb-3 mt-4 first:mt-0">{children}</h1>,
-                    h2: ({ children }) => <h2 className="text-xl font-bold mb-2 mt-3 first:mt-0">{children}</h2>,
+                    ul: ({ children }) => <ul className="mb-3 last:mb-0 pl-4">{children}</ul>,
+                    ol: ({ children }) => <ol className="mb-3 last:mb-0 pl-4">{children}</ol>,
+                    h1: ({ children }) => <h1 className="text-xl font-bold mb-3 mt-4 first:mt-0">{children}</h1>,
+                    h2: ({ children }) => <h2 className="text-lg font-bold mb-2 mt-3 first:mt-0">{children}</h2>,
                     h3: ({ children }) => <h3 className="text-base font-bold mb-2 mt-3 first:mt-0">{children}</h3>,
                   }}
                 >
                   {message.content}
                 </ReactMarkdown>
                 {isStreaming && (
-                  <span className="inline-block w-2 h-4 bg-blue-600 animate-pulse rounded-full ml-1"></span>
+                  <span className="inline-block w-2 h-4 bg-blue-600 animate-pulse ml-1"></span>
                 )}
               </div>
             )}
