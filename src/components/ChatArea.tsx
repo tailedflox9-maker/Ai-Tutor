@@ -10,9 +10,10 @@ interface ChatAreaProps {
   isLoading: boolean;
   streamingMessage?: Message | null;
   hasApiKey: boolean;
+  settings: { selectedModel: 'google' | 'zhipu' }; // Add settings prop
 }
 
-export function ChatArea({ messages, onSendMessage, isLoading, streamingMessage, hasApiKey }: ChatAreaProps) {
+export function ChatArea({ messages, onSendMessage, isLoading, streamingMessage, hasApiKey, settings }: ChatAreaProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -56,6 +57,7 @@ export function ChatArea({ messages, onSendMessage, isLoading, streamingMessage,
                 key={message.id}
                 message={message}
                 isStreaming={streamingMessage?.id === message.id}
+                model={settings.selectedModel}
               />
             ))}
           </div>
