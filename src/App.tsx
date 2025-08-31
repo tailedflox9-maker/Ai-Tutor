@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ChatArea } from './components/ChatArea';
 import { SettingsModal } from './components/SettingsModal';
-import { ThemeToggle } from './components/ThemeToggle';
 import { Conversation, Message, APISettings } from './types';
 import { aiService } from './services/aiService';
 import { storageUtils } from './utils/storage';
@@ -22,10 +21,8 @@ function App() {
   const [settings, setSettings] = useState<APISettings>(defaultSettings);
   const [isLoading, setIsLoading] = useState(false);
   const [streamingMessage, setStreamingMessage] = useState<Message | null>(null);
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
 
-  // Load data from localStorage on mount
   useEffect(() => {
     const savedConversations = storageUtils.getConversations();
     const savedSettings = storageUtils.getSettings();
@@ -37,12 +34,10 @@ function App() {
     aiService.updateSettings(savedSettings);
   }, []);
 
-  // Save conversations to localStorage when they change
   useEffect(() => {
     storageUtils.saveConversations(conversations);
   }, [conversations]);
 
-  // Handle window resize for responsive sidebar
   useEffect(() => {
     const handleResize = () => {
       setSidebarOpen(window.innerWidth >= 768);
@@ -51,14 +46,6 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Toggle theme
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    document.documentElement.classList.toggle('light-theme', newTheme === 'light');
-  };
-
-  // Handle model change
   const handleModelChange = (model: 'google' | 'zhipu') => {
     const newSettings = { ...settings, selectedModel: model };
     setSettings(newSettings);
@@ -202,7 +189,6 @@ function App() {
           <Menu className="w-5 h-5 text-white" />
         </button>
       )}
-      <ThemeToggle theme={theme} onToggle={toggleTheme} />
       <ChatArea
         messages={currentConversation?.messages || []}
         onSendMessage={handleSendMessage}
