@@ -1,6 +1,6 @@
 // FILE: src/components/ChatInput.tsx
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Loader2 } from 'lucide-react';
+import { Send, Loader2, Paperclip } from 'lucide-react';
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
@@ -37,27 +37,40 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
   return (
     <div className="relative">
       <form onSubmit={handleSubmit}>
-        <textarea
-          ref={textareaRef}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Ask anything."
-          disabled={disabled || isLoading}
-          className="w-full min-h-[52px] max-h-[200px] px-4 py-3 pr-12 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 placeholder-gray-500 resize-none focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
-          rows={1}
-        />
-        <button
-          type="submit"
-          disabled={!input.trim() || isLoading || disabled}
-          className="absolute right-2 bottom-2 p-2 text-gray-400 hover:text-gray-200 disabled:text-gray-600 disabled:cursor-not-allowed transition-colors"
-        >
-          {isLoading ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : (
-            <Send className="w-5 h-5" />
-          )}
-        </button>
+        <div className="flex items-end gap-2">
+          <button
+            type="button"
+            disabled={disabled || isLoading}
+            className="p-2 text-gray-500 hover:text-gray-300 disabled:text-gray-600 disabled:cursor-not-allowed transition-colors"
+          >
+            <Paperclip className="w-5 h-5" />
+          </button>
+          
+          <div className="flex-1 relative">
+            <textarea
+              ref={textareaRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Ask anything."
+              disabled={disabled || isLoading}
+              className="w-full min-h-[52px] max-h-[200px] px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 placeholder-gray-500 resize-none focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+              rows={1}
+            />
+          </div>
+          
+          <button
+            type="submit"
+            disabled={!input.trim() || isLoading || disabled}
+            className="p-2 text-gray-500 hover:text-gray-300 disabled:text-gray-600 disabled:cursor-not-allowed transition-colors"
+          >
+            {isLoading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <Send className="w-5 h-5" />
+            )}
+          </button>
+        </div>
       </form>
       
       {disabled && (
