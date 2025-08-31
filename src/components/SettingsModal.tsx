@@ -38,9 +38,7 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
             <X className="w-5 h-5" />
           </button>
         </div>
-
         <div className="p-6 space-y-6">
-          {/* Model Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
               Select AI Model
@@ -61,7 +59,6 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
                   <div className="text-sm text-gray-500">Gemma-3-27b-it</div>
                 </div>
               </label>
-              
               <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                 <input
                   type="radio"
@@ -79,8 +76,6 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
               </label>
             </div>
           </div>
-
-          {/* Google API Key */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Google AI API Key
@@ -102,8 +97,6 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
               </a>
             </p>
           </div>
-
-          {/* ZhipuAI API Key */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               ZhipuAI API Key
@@ -126,7 +119,6 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
             </p>
           </div>
         </div>
-
         <div className="flex justify-end gap-3 p-6 border-t border-gray-200">
           <button
             onClick={onClose}
@@ -136,7 +128,8 @@ export function SettingsModal({ isOpen, onClose, settings, onSaveSettings }: Set
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
+            disabled={!localSettings.googleApiKey && !localSettings.zhipuApiKey}
           >
             Save Settings
           </button>
