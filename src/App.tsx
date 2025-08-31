@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ChatArea } from './components/ChatArea';
 import { SettingsModal } from './components/SettingsModal';
@@ -28,13 +28,11 @@ function App() {
 
     setConversations(savedConversations);
     setSettings(savedSettings);
+    aiService.updateSettings(savedSettings);
 
     if (savedConversations.length > 0) {
       setCurrentConversationId(savedConversations[0].id);
     }
-
-    // Update AI service with saved settings
-    aiService.updateSettings(savedSettings);
   }, []);
 
   // Save conversations to localStorage when they change
@@ -45,7 +43,7 @@ function App() {
   const currentConversation = conversations.find(c => c.id === currentConversationId);
   const hasApiKey = settings.googleApiKey || settings.zhipuApiKey;
 
-  const handleNewConversation = () => {
+  const handleNewConversation = useCallback(() => {
     const newConversation: Conversation = {
       id: generateId(),
       title: 'New Chat',
@@ -55,27 +53,27 @@ function App() {
     };
     setConversations(prev => [newConversation, ...prev]);
     setCurrentConversationId(newConversation.id);
-  };
+  }, []);
 
-  const handleSelectConversation = (id: string) => {
+  const handleSelectConversation = useCallback((id: string) => {
     setCurrentConversationId(id);
-  };
+  }, []);
 
-  const handleDeleteConversation = (id: string) => {
+  const handleDeleteConversation = useCallback((id: string) => {
     setConversations(prev => prev.filter(c => c.id !== id));
     if (currentConversationId === id) {
       const remaining = conversations.filter(c => c.id !== id);
       setCurrentConversationId(remaining.length > 0 ? remaining[0].id : null);
     }
-  };
+  }, [currentConversationId, conversations]);
 
-  const handleSaveSettings = (newSettings: APISettings) => {
+  const handleSaveSettings = useCallback((newSettings: APISettings) => {
     setSettings(newSettings);
     storageUtils.saveSettings(newSettings);
     aiService.updateSettings(newSettings);
-  };
+  }, []);
 
-  const handleSendMessage = async (content: string) => {
+  const handleSendMessage = useCallback(async (content: string) => {
     if (!hasApiKey) {
       setIsSettingsOpen(true);
       return;
@@ -109,7 +107,6 @@ function App() {
       if (conv.id === targetConversationId) {
         const updatedMessages = [...conv.messages, userMessage];
         const updatedTitle = conv.messages.length === 0 ? generateConversationTitle(content) : conv.title;
-
         return {
           ...conv,
           title: updatedTitle,
@@ -142,7 +139,6 @@ function App() {
       }));
 
       let fullResponse = '';
-
       for await (const chunk of aiService.generateStreamingResponse(messages)) {
         fullResponse += chunk;
         setStreamingMessage(prev => prev ? { ...prev, content: fullResponse } : null);
@@ -172,7 +168,7 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentConversation, currentConversationId, hasApiKey]);
 
   return (
     <div className="h-screen flex bg-gray-50">
