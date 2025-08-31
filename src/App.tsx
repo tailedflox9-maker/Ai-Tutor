@@ -6,7 +6,6 @@ import { Conversation, Message, APISettings } from './types';
 import { aiService } from './services/aiService';
 import { storageUtils } from './utils/storage';
 import { generateId, generateConversationTitle } from './utils/helpers';
-import { FileCode, Settings as SettingsIcon, Trash2, X } from 'lucide-react'; // Import necessary icons
 
 const defaultSettings: APISettings = {
   googleApiKey: '',
@@ -26,10 +25,10 @@ function App() {
   useEffect(() => {
     const savedConversations = storageUtils.getConversations();
     const savedSettings = storageUtils.getSettings();
-
+    
     setConversations(savedConversations);
     setSettings(savedSettings);
-
+    
     if (savedConversations.length > 0) {
       setCurrentConversationId(savedConversations[0].id);
     }
@@ -111,7 +110,7 @@ function App() {
       if (conv.id === targetConversationId) {
         const updatedMessages = [...conv.messages, userMessage];
         const updatedTitle = conv.messages.length === 0 ? generateConversationTitle(content) : conv.title;
-
+        
         return {
           ...conv,
           title: updatedTitle,
@@ -134,7 +133,7 @@ function App() {
 
       setStreamingMessage(assistantMessage);
 
-      const conversationHistory = currentConversation
+      const conversationHistory = currentConversation 
         ? [...currentConversation.messages, userMessage]
         : [userMessage];
 
@@ -176,7 +175,7 @@ function App() {
   };
 
   return (
-    <div className="h-screen flex bg-gray-50 dark:bg-gray-900"> {/* Added dark:bg-gray-900 for dark mode potential */}
+    <div className="h-screen flex bg-gray-50">
       <Sidebar
         conversations={conversations}
         currentConversationId={currentConversationId}
@@ -185,7 +184,7 @@ function App() {
         onDeleteConversation={handleDeleteConversation}
         onOpenSettings={() => setIsSettingsOpen(true)}
       />
-
+      
       <ChatArea
         messages={currentConversation?.messages || []}
         onSendMessage={handleSendMessage}
