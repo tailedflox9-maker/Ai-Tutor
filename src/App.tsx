@@ -1,4 +1,3 @@
-// FILE: src/App.tsx
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ChatArea } from './components/ChatArea';
@@ -22,10 +21,10 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [streamingMessage, setStreamingMessage] = useState<Message | null>(null);
 
+  // Load data from localStorage on mount
   useEffect(() => {
     const savedConversations = storageUtils.getConversations();
     const savedSettings = storageUtils.getSettings();
-    
     setConversations(savedConversations);
     setSettings(savedSettings);
     
@@ -33,9 +32,11 @@ function App() {
       setCurrentConversationId(savedConversations[0].id);
     }
     
+    // Update AI service with saved settings
     aiService.updateSettings(savedSettings);
   }, []);
 
+  // Save conversations to localStorage when they change
   useEffect(() => {
     storageUtils.saveConversations(conversations);
   }, [conversations]);
@@ -80,6 +81,7 @@ function App() {
     }
 
     let targetConversationId = currentConversationId;
+    // Create new conversation if none exists
     if (!targetConversationId) {
       const newConversation: Conversation = {
         id: generateId(),
@@ -100,11 +102,11 @@ function App() {
       timestamp: new Date(),
     };
 
+    // Update conversation with user message
     setConversations(prev => prev.map(conv => {
       if (conv.id === targetConversationId) {
         const updatedMessages = [...conv.messages, userMessage];
         const updatedTitle = conv.messages.length === 0 ? generateConversationTitle(content) : conv.title;
-        
         return {
           ...conv,
           title: updatedTitle,
@@ -140,11 +142,12 @@ function App() {
         setStreamingMessage(prev => prev ? { ...prev, content: fullResponse } : null);
       }
 
+      // Add final assistant message to conversation
       const finalAssistantMessage: Message = {
         ...assistantMessage,
         content: fullResponse,
       };
-
+      
       setConversations(prev => prev.map(conv => {
         if (conv.id === targetConversationId) {
           return {
@@ -155,7 +158,7 @@ function App() {
         }
         return conv;
       }));
-
+      
       setStreamingMessage(null);
     } catch (error) {
       console.error('Error sending message:', error);
@@ -166,7 +169,7 @@ function App() {
   };
 
   return (
-    <div className="h-screen flex bg-gray-900 text-gray-100">
+    <div className="h-screen flex bg-gray-900 text-white">
       <Sidebar
         conversations={conversations}
         currentConversationId={currentConversationId}
@@ -175,7 +178,6 @@ function App() {
         onDeleteConversation={handleDeleteConversation}
         onOpenSettings={() => setIsSettingsOpen(true)}
       />
-      
       <ChatArea
         messages={currentConversation?.messages || []}
         onSendMessage={handleSendMessage}
@@ -183,7 +185,6 @@ function App() {
         streamingMessage={streamingMessage}
         hasApiKey={hasApiKey}
       />
-      
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
