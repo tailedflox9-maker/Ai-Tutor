@@ -6,7 +6,6 @@ import { Conversation, Message, APISettings } from './types';
 import { aiService } from './services/aiService';
 import { storageUtils } from './utils/storage';
 import { generateId, generateConversationTitle } from './utils/helpers';
-import { Moon, Sun } from 'lucide-react';
 
 const defaultSettings: APISettings = {
   googleApiKey: '',
@@ -21,14 +20,9 @@ function App() {
   const [settings, setSettings] = useState<APISettings>(defaultSettings);
   const [isLoading, setIsLoading] = useState(false);
   const [streamingMessage, setStreamingMessage] = useState<Message | null>(null);
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
-  // Load theme, conversations, and settings on mount
+  // Load data from localStorage on mount
   useEffect(() => {
-    const savedTheme = (localStorage.getItem('theme') as 'light' | 'dark') || 'dark';
-    setTheme(savedTheme);
-    document.documentElement.classList.toggle('dark', savedTheme === 'dark');
-
     const savedConversations = storageUtils.getConversations();
     const savedSettings = storageUtils.getSettings();
 
@@ -39,16 +33,9 @@ function App() {
       setCurrentConversationId(savedConversations[0].id);
     }
 
+    // Update AI service with saved settings
     aiService.updateSettings(savedSettings);
   }, []);
-
-  // Toggle theme
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    document.documentElement.classList.toggle('dark', newTheme === 'dark');
-  };
 
   // Save conversations to localStorage when they change
   useEffect(() => {
@@ -96,6 +83,7 @@ function App() {
 
     let targetConversationId = currentConversationId;
 
+    // Create new conversation if none exists
     if (!targetConversationId) {
       const newConversation: Conversation = {
         id: generateId(),
@@ -116,10 +104,12 @@ function App() {
       timestamp: new Date(),
     };
 
+    // Update conversation with user message
     setConversations(prev => prev.map(conv => {
       if (conv.id === targetConversationId) {
         const updatedMessages = [...conv.messages, userMessage];
         const updatedTitle = conv.messages.length === 0 ? generateConversationTitle(content) : conv.title;
+
         return {
           ...conv,
           title: updatedTitle,
@@ -158,6 +148,7 @@ function App() {
         setStreamingMessage(prev => prev ? { ...prev, content: fullResponse } : null);
       }
 
+      // Add final assistant message to conversation
       const finalAssistantMessage: Message = {
         ...assistantMessage,
         content: fullResponse,
@@ -184,7 +175,7 @@ function App() {
   };
 
   return (
-    <div className="h-screen flex bg-[var(--color-bg)]">
+    <div className="h-screen flex bg-gray-50">
       <Sidebar
         conversations={conversations}
         currentConversationId={currentConversationId}
@@ -193,27 +184,15 @@ function App() {
         onDeleteConversation={handleDeleteConversation}
         onOpenSettings={() => setIsSettingsOpen(true)}
       />
-      <div className="flex-1 flex flex-col relative">
-        <div className="absolute top-4 right-4 z-10">
-          <button
-            onClick={toggleTheme}
-            className="p-2 hover:bg-[var(--color-card)] rounded-lg transition-colors"
-          >
-            {theme === 'dark' ? (
-              <Sun className="w-5 h-5 text-yellow-400" />
-            ) : (
-              <Moon className="w-5 h-5 text-gray-600" />
-            )}
-          </button>
-        </div>
-        <ChatArea
-          messages={currentConversation?.messages || []}
-          onSendMessage={handleSendMessage}
-          isLoading={isLoading}
-          streamingMessage={streamingMessage}
-          hasApiKey={hasApiKey}
-        />
-      </div>
+
+      <ChatArea
+        messages={currentConversation?.messages || []}
+        onSendMessage={handleSendMessage}
+        isLoading={isLoading}
+        streamingMessage={streamingMessage}
+        hasApiKey={hasApiKey}
+      />
+
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
