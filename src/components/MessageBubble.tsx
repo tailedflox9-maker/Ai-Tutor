@@ -14,6 +14,7 @@ interface MessageBubbleProps {
 export function MessageBubble({ message, isStreaming = false }: MessageBubbleProps) {
   const isUser = message.role === 'user';
   const [copied, setCopied] = React.useState(false);
+
   const handleCopy = async () => {
     await navigator.clipboard.writeText(message.content);
     setCopied(true);
@@ -21,41 +22,43 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
   };
 
   return (
-    <div className={`group py-6 hover:bg-gray-900/30 transition-colors ${isUser ? '' : 'bg-[var(--color-card)]'}`}>
+    <div className={`group py-6 ${isUser ? '' : 'bg-gray-50'}`}>
       <div className="flex gap-4 max-w-full">
-        <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
-          isUser ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-card)]'
+        <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+          isUser ? 'bg-blue-600' : 'bg-gray-700'
         }`}>
           {isUser ? (
-            <User className="w-5 h-5 text-white" />
+            <User className="w-4 h-4 text-white" />
           ) : (
-            <Bot className="w-5 h-5 text-[var(--color-accent)]" />
+            <Bot className="w-4 h-4 text-white" />
           )}
         </div>
+        
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-sm font-medium text-[var(--color-text-primary)]">
+            <span className="text-sm font-medium text-gray-900">
               {isUser ? 'You' : 'AI Tutor'}
             </span>
             {!isUser && (
               <button
                 onClick={handleCopy}
-                className="opacity-0 group-hover:opacity-100 p-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-all"
+                className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-gray-600 transition-all"
                 title="Copy message"
               >
                 {copied ? (
-                  <Check className="w-3 h-3 text-green-500" />
+                  <Check className="w-3 h-3 text-green-600" />
                 ) : (
                   <Copy className="w-3 h-3" />
                 )}
               </button>
             )}
           </div>
+          
           <div className="prose prose-sm max-w-none">
             {isUser ? (
-              <p className="text-[var(--color-text-primary)] whitespace-pre-wrap m-0">{message.content}</p>
+              <p className="text-gray-800 whitespace-pre-wrap m-0">{message.content}</p>
             ) : (
-              <div className="text-[var(--color-text-primary)]">
+              <div className="text-gray-800">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
@@ -72,7 +75,7 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
                           {String(children).replace(/\n$/, '')}
                         </SyntaxHighlighter>
                       ) : (
-                        <code className="bg-gray-800 px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
+                        <code className="bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
                           {children}
                         </code>
                       );
@@ -88,7 +91,7 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
                   {message.content}
                 </ReactMarkdown>
                 {isStreaming && (
-                  <span className="inline-block w-2 h-4 bg-[var(--color-accent)] animate-pulse ml-1"></span>
+                  <span className="inline-block w-2 h-4 bg-blue-600 animate-pulse ml-1"></span>
                 )}
               </div>
             )}
