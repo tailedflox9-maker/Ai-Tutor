@@ -66,7 +66,7 @@ class AIService {
     }
 
     const model = this.googleAI.getGenerativeModel({ 
-      model: 'gemini-1.5-flash',
+      model: 'gemma-3-27b-it',
       generationConfig: {
         temperature: 0.7,
         topP: 0.8,
@@ -113,7 +113,7 @@ class AIService {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'glm-4-flash',
+        model: 'GLM-4.5-Flash',
         messages: messages.map(msg => ({
           role: msg.role,
           content: msg.content,
