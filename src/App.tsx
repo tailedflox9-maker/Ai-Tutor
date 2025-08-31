@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ChatArea } from './components/ChatArea';
 import { SettingsModal } from './components/SettingsModal';
+import { ThemeToggle } from './components/ThemeToggle';
 import { Conversation, Message, APISettings } from './types';
 import { aiService } from './services/aiService';
 import { storageUtils } from './utils/storage';
 import { generateId, generateConversationTitle } from './utils/helpers';
+import { Menu } from 'lucide-react';
 
 const defaultSettings: APISettings = {
   googleApiKey: '',
@@ -20,20 +22,18 @@ function App() {
   const [settings, setSettings] = useState<APISettings>(defaultSettings);
   const [isLoading, setIsLoading] = useState(false);
   const [streamingMessage, setStreamingMessage] = useState<Message | null>(null);
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
 
   // Load data from localStorage on mount
   useEffect(() => {
     const savedConversations = storageUtils.getConversations();
     const savedSettings = storageUtils.getSettings();
-    
     setConversations(savedConversations);
     setSettings(savedSettings);
-    
     if (savedConversations.length > 0) {
       setCurrentConversationId(savedConversations[0].id);
     }
-
-    // Update AI service with saved settings
     aiService.updateSettings(savedSettings);
   }, []);
 
@@ -41,6 +41,30 @@ function App() {
   useEffect(() => {
     storageUtils.saveConversations(conversations);
   }, [conversations]);
+
+  // Handle window resize for responsive sidebar
+  useEffect(() => {
+    const handleResize = () => {
+      setSidebarOpen(window.innerWidth >= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Toggle theme
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    document.documentElement.classList.toggle('light-theme', newTheme === 'light');
+  };
+
+  // Handle model change
+  const handleModelChange = (model: 'google' | 'zhipu') => {
+    const newSettings = { ...settings, selectedModel: model };
+    setSettings(newSettings);
+    storageUtils.saveSettings(newSettings);
+    aiService.updateSettings(newSettings);
+  };
 
   const currentConversation = conversations.find(c => c.id === currentConversationId);
   const hasApiKey = settings.googleApiKey || settings.zhipuApiKey;
@@ -53,7 +77,6 @@ function App() {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-
     setConversations(prev => [newConversation, ...prev]);
     setCurrentConversationId(newConversation.id);
   };
@@ -81,10 +104,7 @@ function App() {
       setIsSettingsOpen(true);
       return;
     }
-
     let targetConversationId = currentConversationId;
-
-    // Create new conversation if none exists
     if (!targetConversationId) {
       const newConversation: Conversation = {
         id: generateId(),
@@ -97,20 +117,16 @@ function App() {
       targetConversationId = newConversation.id;
       setCurrentConversationId(targetConversationId);
     }
-
     const userMessage: Message = {
       id: generateId(),
       content,
       role: 'user',
       timestamp: new Date(),
     };
-
-    // Update conversation with user message
     setConversations(prev => prev.map(conv => {
       if (conv.id === targetConversationId) {
         const updatedMessages = [...conv.messages, userMessage];
         const updatedTitle = conv.messages.length === 0 ? generateConversationTitle(content) : conv.title;
-        
         return {
           ...conv,
           title: updatedTitle,
@@ -120,9 +136,7 @@ function App() {
       }
       return conv;
     }));
-
     setIsLoading(true);
-
     try {
       const assistantMessage: Message = {
         id: generateId(),
@@ -130,30 +144,23 @@ function App() {
         role: 'assistant',
         timestamp: new Date(),
       };
-
       setStreamingMessage(assistantMessage);
-
-      const conversationHistory = currentConversation 
+      const conversationHistory = currentConversation
         ? [...currentConversation.messages, userMessage]
         : [userMessage];
-
       const messages = conversationHistory.map(msg => ({
         role: msg.role,
         content: msg.content,
       }));
-
       let fullResponse = '';
       for await (const chunk of aiService.generateStreamingResponse(messages)) {
         fullResponse += chunk;
         setStreamingMessage(prev => prev ? { ...prev, content: fullResponse } : null);
       }
-
-      // Add final assistant message to conversation
       const finalAssistantMessage: Message = {
         ...assistantMessage,
         content: fullResponse,
       };
-
       setConversations(prev => prev.map(conv => {
         if (conv.id === targetConversationId) {
           return {
@@ -164,7 +171,6 @@ function App() {
         }
         return conv;
       }));
-
       setStreamingMessage(null);
     } catch (error) {
       console.error('Error sending message:', error);
@@ -176,15 +182,27 @@ function App() {
 
   return (
     <div className="h-screen flex bg-gray-50">
-      <Sidebar
-        conversations={conversations}
-        currentConversationId={currentConversationId}
-        onNewConversation={handleNewConversation}
-        onSelectConversation={handleSelectConversation}
-        onDeleteConversation={handleDeleteConversation}
-        onOpenSettings={() => setIsSettingsOpen(true)}
-      />
-      
+      {sidebarOpen && (
+        <Sidebar
+          conversations={conversations}
+          currentConversationId={currentConversationId}
+          onNewConversation={handleNewConversation}
+          onSelectConversation={handleSelectConversation}
+          onDeleteConversation={handleDeleteConversation}
+          onOpenSettings={() => setIsSettingsOpen(true)}
+          settings={settings}
+          onModelChange={handleModelChange}
+        />
+      )}
+      {!sidebarOpen && (
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="fixed top-4 left-4 p-2 bg-gray-800 rounded-lg z-50"
+        >
+          <Menu className="w-5 h-5 text-white" />
+        </button>
+      )}
+      <ThemeToggle theme={theme} onToggle={toggleTheme} />
       <ChatArea
         messages={currentConversation?.messages || []}
         onSendMessage={handleSendMessage}
@@ -192,7 +210,6 @@ function App() {
         streamingMessage={streamingMessage}
         hasApiKey={hasApiKey}
       />
-
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
