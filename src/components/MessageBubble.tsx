@@ -22,82 +22,49 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
   };
 
   return (
-    <div className={`group py-6 ${isUser ? '' : 'bg-gray-50'}`}>
-      <div className="flex gap-4 max-w-full">
-        <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-          isUser ? 'bg-blue-600' : 'bg-gray-700'
-        }`}>
-          {isUser ? (
-            <User className="w-4 h-4 text-white" />
-          ) : (
-            <Bot className="w-4 h-4 text-white" />
-          )}
+    <div className={`flex gap-3 mb-4 ${isUser ? 'justify-end' : 'justify-start'}`}>
+      {!isUser && (
+        <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-gray-200">
+          <Bot className="w-4 h-4 text-gray-600" />
         </div>
-        
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-sm font-medium text-gray-900">
-              {isUser ? 'You' : 'AI Tutor'}
-            </span>
-            {!isUser && (
-              <button
-                onClick={handleCopy}
-                className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-gray-600 transition-all"
-                title="Copy message"
-              >
-                {copied ? (
-                  <Check className="w-3 h-3 text-green-600" />
+      )}
+      <div
+        className={`max-w-[80%] p-3 rounded-lg ${isUser ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-800'}`}
+      >
+        <div className="prose prose-sm max-w-none">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              code({ node, inline, className, children, ...props }) {
+                const match = /language-(\w+)/.exec(className || '');
+                return !inline && match ? (
+                  <SyntaxHighlighter
+                    style={oneDark}
+                    language={match[1]}
+                    PreTag="div"
+                    className="rounded-md my-2"
+                    {...props}
+                  >
+                    {String(children).replace(/\n$/, '')}
+                  </SyntaxHighlighter>
                 ) : (
-                  <Copy className="w-3 h-3" />
-                )}
-              </button>
-            )}
-          </div>
-          
-          <div className="prose prose-sm max-w-none">
-            {isUser ? (
-              <p className="text-gray-800 whitespace-pre-wrap m-0">{message.content}</p>
-            ) : (
-              <div className="text-gray-800">
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  components={{
-                    code({ node, inline, className, children, ...props }) {
-                      const match = /language-(\w+)/.exec(className || '');
-                      return !inline && match ? (
-                        <SyntaxHighlighter
-                          style={oneDark}
-                          language={match[1]}
-                          PreTag="div"
-                          className="rounded-md !mt-2 !mb-2"
-                          {...props}
-                        >
-                          {String(children).replace(/\n$/, '')}
-                        </SyntaxHighlighter>
-                      ) : (
-                        <code className="bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
-                          {children}
-                        </code>
-                      );
-                    },
-                    p: ({ children }) => <p className="mb-3 last:mb-0">{children}</p>,
-                    ul: ({ children }) => <ul className="mb-3 last:mb-0 pl-4">{children}</ul>,
-                    ol: ({ children }) => <ol className="mb-3 last:mb-0 pl-4">{children}</ol>,
-                    h1: ({ children }) => <h1 className="text-xl font-bold mb-3 mt-4 first:mt-0">{children}</h1>,
-                    h2: ({ children }) => <h2 className="text-lg font-bold mb-2 mt-3 first:mt-0">{children}</h2>,
-                    h3: ({ children }) => <h3 className="text-base font-bold mb-2 mt-3 first:mt-0">{children}</h3>,
-                  }}
-                >
-                  {message.content}
-                </ReactMarkdown>
-                {isStreaming && (
-                  <span className="inline-block w-2 h-4 bg-blue-600 animate-pulse ml-1"></span>
-                )}
-              </div>
-            )}
-          </div>
+                  <code className="bg-gray-200 px-1.5 py-0.5 rounded text-sm" {...props}>
+                    {children}
+                  </code>
+                );
+              },
+            }}
+          >
+            {message.content}
+          </ReactMarkdown>
+          {isStreaming && <span className="inline-block w-2 h-2 bg-blue-500 rounded-full animate-pulse ml-1"></span>}
         </div>
       </div>
+      {isUser && (
+        <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-blue-500">
+          <User className="w-4 h-4 text-white" />
+        </div>
+      )}
     </div>
   );
 }
