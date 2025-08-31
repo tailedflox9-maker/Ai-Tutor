@@ -13,7 +13,6 @@ class AIService {
 
   private initializeProviders() {
     if (!this.settings) return;
-
     // Initialize Google AI
     if (this.settings.googleApiKey) {
       try {
@@ -22,12 +21,9 @@ class AIService {
         console.error('Failed to initialize Google AI:', error);
       }
     }
-
     // Initialize ZhipuAI
     if (this.settings.zhipuApiKey) {
       try {
-        // Note: ZhipuAI SDK would be initialized here
-        // For now, we'll use fetch API directly
         this.zhipuAI = { apiKey: this.settings.zhipuApiKey };
       } catch (error) {
         console.error('Failed to initialize ZhipuAI:', error);
@@ -44,11 +40,20 @@ class AIService {
       return;
     }
 
+    // Define a system prompt for educational responses
+    const systemPrompt = `
+      You are a helpful AI tutor. Provide clear, educational responses that help users learn effectively.
+      Use markdown formatting with headings, lists, and code blocks to structure your answers.
+      If the user asks for examples, provide practical examples.
+      If the user asks for explanations, break down complex concepts into simple terms.
+      If the user asks for a quiz, create a quiz question or practice problem based on the topic.
+    `;
+
     try {
       if (this.settings.selectedModel === 'google') {
-        yield* this.generateGoogleResponse(messages, onUpdate);
+        yield* this.generateGoogleResponse(messages, systemPrompt, onUpdate);
       } else {
-        yield* this.generateZhipuResponse(messages, onUpdate);
+        yield* this.generateZhipuResponse(messages, systemPrompt, onUpdate);
       }
     } catch (error) {
       console.error('Error generating response:', error);
@@ -58,6 +63,7 @@ class AIService {
 
   private async *generateGoogleResponse(
     messages: Array<{ role: string; content: string }>,
+    systemPrompt: string,
     onUpdate?: (content: string) => void
   ): AsyncGenerator<string, void, unknown> {
     if (!this.googleAI) {
@@ -65,7 +71,13 @@ class AIService {
       return;
     }
 
-    const model = this.googleAI.getGenerativeModel({ 
+    // For Google Gemini, include the system prompt as the first message
+    const messagesWithSystemPrompt = [
+      { role: 'user', content: systemPrompt },
+      ...messages,
+    ];
+
+    const model = this.googleAI.getGenerativeModel({
       model: 'gemma-3-27b-it',
       generationConfig: {
         temperature: 0.7,
@@ -76,13 +88,13 @@ class AIService {
     });
 
     const chat = model.startChat({
-      history: messages.slice(0, -1).map(msg => ({
+      history: messagesWithSystemPrompt.slice(0, -1).map(msg => ({
         role: msg.role === 'assistant' ? 'model' : 'user',
         parts: [{ text: msg.content }],
       })),
     });
 
-    const lastMessage = messages[messages.length - 1];
+    const lastMessage = messagesWithSystemPrompt[messagesWithSystemPrompt.length - 1];
     const result = await chat.sendMessageStream(lastMessage.content);
 
     let fullResponse = '';
@@ -98,6 +110,7 @@ class AIService {
 
   private async *generateZhipuResponse(
     messages: Array<{ role: string; content: string }>,
+    systemPrompt: string,
     onUpdate?: (content: string) => void
   ): AsyncGenerator<string, void, unknown> {
     if (!this.zhipuAI?.apiKey) {
@@ -105,7 +118,12 @@ class AIService {
       return;
     }
 
-    // Using fetch API for ZhipuAI GLM-4.5-Flash
+    // For ZhipuAI, include the system prompt as the first message
+    const messagesWithSystemPrompt = [
+      { role: 'system', content: systemPrompt },
+      ...messages,
+    ];
+
     const response = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
       method: 'POST',
       headers: {
@@ -114,7 +132,7 @@ class AIService {
       },
       body: JSON.stringify({
         model: 'GLM-4.5-Flash',
-        messages: messages.map(msg => ({
+        messages: messagesWithSystemPrompt.map(msg => ({
           role: msg.role,
           content: msg.content,
         })),
@@ -137,20 +155,16 @@ class AIService {
 
     const decoder = new TextDecoder();
     let fullResponse = '';
-
     try {
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-
         const chunk = decoder.decode(value);
         const lines = chunk.split('\n');
-
         for (const line of lines) {
           if (line.startsWith('data: ')) {
             const data = line.slice(6);
             if (data === '[DONE]') return;
-
             try {
               const parsed = JSON.parse(data);
               const content = parsed.choices?.[0]?.delta?.content;
@@ -173,6 +187,14 @@ class AIService {
   }
 
   async generateResponse(messages: Array<{ role: string; content: string }>): Promise<string> {
+    const systemPrompt = `
+      You are a helpful AI tutor. Provide clear, educational responses that help users learn effectively.
+      Use markdown formatting with headings, lists, and code blocks to structure your answers.
+      If the user asks for examples, provide practical examples.
+      If the user asks for explanations, break down complex concepts into simple terms.
+      If the user asks for a quiz, create a quiz question or practice problem based on the topic.
+    `;
+
     let fullResponse = '';
     for await (const chunk of this.generateStreamingResponse(messages)) {
       fullResponse += chunk;
