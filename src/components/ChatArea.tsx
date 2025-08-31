@@ -50,7 +50,7 @@ export function ChatArea({ messages, onSendMessage, isLoading, streamingMessage,
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto">
-          <div className="max-w-3xl mx-auto px-4">
+          <div className="max-w-3xl mx-auto px-4 py-6">
             {allMessages.map((message) => (
               <MessageBubble
                 key={message.id}
@@ -62,12 +62,11 @@ export function ChatArea({ messages, onSendMessage, isLoading, streamingMessage,
           <div ref={messagesEndRef} />
         </div>
       )}
-
-      <div className="border-t border-gray-200">
-        <div className="max-w-3xl mx-auto px-4">
-          <ChatInput 
-            onSendMessage={onSendMessage} 
-            isLoading={isLoading} 
+      <div className="border-t border-gray-200 p-4">
+        <div className="max-w-3xl mx-auto">
+          <ChatInput
+            onSendMessage={onSendMessage}
+            isLoading={isLoading}
             disabled={!hasApiKey}
           />
         </div>
