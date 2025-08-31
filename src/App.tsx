@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ChatArea } from './components/ChatArea';
 import { SettingsModal } from './components/SettingsModal';
@@ -25,14 +25,16 @@ function App() {
   useEffect(() => {
     const savedConversations = storageUtils.getConversations();
     const savedSettings = storageUtils.getSettings();
-
+    
     setConversations(savedConversations);
     setSettings(savedSettings);
-    aiService.updateSettings(savedSettings);
-
+    
     if (savedConversations.length > 0) {
       setCurrentConversationId(savedConversations[0].id);
     }
+
+    // Update AI service with saved settings
+    aiService.updateSettings(savedSettings);
   }, []);
 
   // Save conversations to localStorage when they change
@@ -43,7 +45,7 @@ function App() {
   const currentConversation = conversations.find(c => c.id === currentConversationId);
   const hasApiKey = settings.googleApiKey || settings.zhipuApiKey;
 
-  const handleNewConversation = useCallback(() => {
+  const handleNewConversation = () => {
     const newConversation: Conversation = {
       id: generateId(),
       title: 'New Chat',
@@ -51,29 +53,30 @@ function App() {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
+
     setConversations(prev => [newConversation, ...prev]);
     setCurrentConversationId(newConversation.id);
-  }, []);
+  };
 
-  const handleSelectConversation = useCallback((id: string) => {
+  const handleSelectConversation = (id: string) => {
     setCurrentConversationId(id);
-  }, []);
+  };
 
-  const handleDeleteConversation = useCallback((id: string) => {
+  const handleDeleteConversation = (id: string) => {
     setConversations(prev => prev.filter(c => c.id !== id));
     if (currentConversationId === id) {
       const remaining = conversations.filter(c => c.id !== id);
       setCurrentConversationId(remaining.length > 0 ? remaining[0].id : null);
     }
-  }, [currentConversationId, conversations]);
+  };
 
-  const handleSaveSettings = useCallback((newSettings: APISettings) => {
+  const handleSaveSettings = (newSettings: APISettings) => {
     setSettings(newSettings);
     storageUtils.saveSettings(newSettings);
     aiService.updateSettings(newSettings);
-  }, []);
+  };
 
-  const handleSendMessage = useCallback(async (content: string) => {
+  const handleSendMessage = async (content: string) => {
     if (!hasApiKey) {
       setIsSettingsOpen(true);
       return;
@@ -107,6 +110,7 @@ function App() {
       if (conv.id === targetConversationId) {
         const updatedMessages = [...conv.messages, userMessage];
         const updatedTitle = conv.messages.length === 0 ? generateConversationTitle(content) : conv.title;
+        
         return {
           ...conv,
           title: updatedTitle,
@@ -129,7 +133,7 @@ function App() {
 
       setStreamingMessage(assistantMessage);
 
-      const conversationHistory = currentConversation
+      const conversationHistory = currentConversation 
         ? [...currentConversation.messages, userMessage]
         : [userMessage];
 
@@ -168,7 +172,7 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentConversation, currentConversationId, hasApiKey]);
+  };
 
   return (
     <div className="h-screen flex bg-gray-50">
@@ -180,7 +184,7 @@ function App() {
         onDeleteConversation={handleDeleteConversation}
         onOpenSettings={() => setIsSettingsOpen(true)}
       />
-
+      
       <ChatArea
         messages={currentConversation?.messages || []}
         onSendMessage={handleSendMessage}
