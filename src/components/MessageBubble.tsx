@@ -22,8 +22,8 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
   };
 
   return (
-    <div className={`group py-4 ${isUser ? 'mb-4' : 'mb-6'}`}>
-      <div className="flex gap-3 max-w-full">
+    <div className={`group py-6 ${isUser ? '' : 'bg-gray-50'}`}>
+      <div className="flex gap-4 max-w-full">
         <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
           isUser ? 'bg-blue-600' : 'bg-gray-700'
         }`}>
@@ -36,17 +36,17 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
         
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-sm font-medium text-gray-300">
+            <span className="text-sm font-medium text-gray-900">
               {isUser ? 'You' : 'AI Tutor'}
             </span>
             {!isUser && (
               <button
                 onClick={handleCopy}
-                className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-gray-300 transition-all"
+                className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-gray-600 transition-all"
                 title="Copy message"
               >
                 {copied ? (
-                  <Check className="w-3 h-3 text-green-400" />
+                  <Check className="w-3 h-3 text-green-600" />
                 ) : (
                   <Copy className="w-3 h-3" />
                 )}
@@ -56,9 +56,9 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
           
           <div className="prose prose-sm max-w-none">
             {isUser ? (
-              <p className="text-gray-200 whitespace-pre-wrap m-0">{message.content}</p>
+              <p className="text-gray-800 whitespace-pre-wrap m-0">{message.content}</p>
             ) : (
-              <div className="text-gray-200">
+              <div className="text-gray-800">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
@@ -72,11 +72,10 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
                           className="rounded-md !mt-2 !mb-2"
                           {...props}
                         >
-                          {String(children).replace(/
-$/, '')}
+                          {String(children).replace(/\n$/, '')}
                         </SyntaxHighlighter>
                       ) : (
-                        <code className="bg-gray-800 px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
+                        <code className="bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
                           {children}
                         </code>
                       );
@@ -92,7 +91,7 @@ $/, '')}
                   {message.content}
                 </ReactMarkdown>
                 {isStreaming && (
-                  <span className="inline-block w-2 h-4 bg-blue-500 animate-pulse ml-1"></span>
+                  <span className="inline-block w-2 h-4 bg-blue-600 animate-pulse ml-1"></span>
                 )}
               </div>
             )}
