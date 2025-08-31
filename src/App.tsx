@@ -6,6 +6,7 @@ import { Conversation, Message, APISettings } from './types';
 import { aiService } from './services/aiService';
 import { storageUtils } from './utils/storage';
 import { generateId, generateConversationTitle } from './utils/helpers';
+import { FileCode, Settings as SettingsIcon, Trash2, X } from 'lucide-react'; // Import necessary icons
 
 const defaultSettings: APISettings = {
   googleApiKey: '',
@@ -21,9 +22,11 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [streamingMessage, setStreamingMessage] = useState<Message | null>(null);
 
+  // Load data from localStorage on mount
   useEffect(() => {
     const savedConversations = storageUtils.getConversations();
     const savedSettings = storageUtils.getSettings();
+
     setConversations(savedConversations);
     setSettings(savedSettings);
 
@@ -31,14 +34,16 @@ function App() {
       setCurrentConversationId(savedConversations[0].id);
     }
 
+    // Update AI service with saved settings
     aiService.updateSettings(savedSettings);
   }, []);
 
+  // Save conversations to localStorage when they change
   useEffect(() => {
     storageUtils.saveConversations(conversations);
   }, [conversations]);
 
-  const currentConversation = conversations.find((c) => c.id === currentConversationId);
+  const currentConversation = conversations.find(c => c.id === currentConversationId);
   const hasApiKey = settings.googleApiKey || settings.zhipuApiKey;
 
   const handleNewConversation = () => {
@@ -49,7 +54,8 @@ function App() {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    setConversations((prev) => [newConversation, ...prev]);
+
+    setConversations(prev => [newConversation, ...prev]);
     setCurrentConversationId(newConversation.id);
   };
 
@@ -58,9 +64,9 @@ function App() {
   };
 
   const handleDeleteConversation = (id: string) => {
-    setConversations((prev) => prev.filter((c) => c.id !== id));
+    setConversations(prev => prev.filter(c => c.id !== id));
     if (currentConversationId === id) {
-      const remaining = conversations.filter((c) => c.id !== id);
+      const remaining = conversations.filter(c => c.id !== id);
       setCurrentConversationId(remaining.length > 0 ? remaining[0].id : null);
     }
   };
@@ -79,6 +85,7 @@ function App() {
 
     let targetConversationId = currentConversationId;
 
+    // Create new conversation if none exists
     if (!targetConversationId) {
       const newConversation: Conversation = {
         id: generateId(),
@@ -87,7 +94,7 @@ function App() {
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-      setConversations((prev) => [newConversation, ...prev]);
+      setConversations(prev => [newConversation, ...prev]);
       targetConversationId = newConversation.id;
       setCurrentConversationId(targetConversationId);
     }
@@ -99,21 +106,21 @@ function App() {
       timestamp: new Date(),
     };
 
-    setConversations((prev) =>
-      prev.map((conv) => {
-        if (conv.id === targetConversationId) {
-          const updatedMessages = [...conv.messages, userMessage];
-          const updatedTitle = conv.messages.length === 0 ? generateConversationTitle(content) : conv.title;
-          return {
-            ...conv,
-            title: updatedTitle,
-            messages: updatedMessages,
-            updatedAt: new Date(),
-          };
-        }
-        return conv;
-      })
-    );
+    // Update conversation with user message
+    setConversations(prev => prev.map(conv => {
+      if (conv.id === targetConversationId) {
+        const updatedMessages = [...conv.messages, userMessage];
+        const updatedTitle = conv.messages.length === 0 ? generateConversationTitle(content) : conv.title;
+
+        return {
+          ...conv,
+          title: updatedTitle,
+          messages: updatedMessages,
+          updatedAt: new Date(),
+        };
+      }
+      return conv;
+    }));
 
     setIsLoading(true);
 
@@ -131,7 +138,7 @@ function App() {
         ? [...currentConversation.messages, userMessage]
         : [userMessage];
 
-      const messages = conversationHistory.map((msg) => ({
+      const messages = conversationHistory.map(msg => ({
         role: msg.role,
         content: msg.content,
       }));
@@ -139,26 +146,25 @@ function App() {
       let fullResponse = '';
       for await (const chunk of aiService.generateStreamingResponse(messages)) {
         fullResponse += chunk;
-        setStreamingMessage((prev) => (prev ? { ...prev, content: fullResponse } : null));
+        setStreamingMessage(prev => prev ? { ...prev, content: fullResponse } : null);
       }
 
+      // Add final assistant message to conversation
       const finalAssistantMessage: Message = {
         ...assistantMessage,
         content: fullResponse,
       };
 
-      setConversations((prev) =>
-        prev.map((conv) => {
-          if (conv.id === targetConversationId) {
-            return {
-              ...conv,
-              messages: [...conv.messages, finalAssistantMessage],
-              updatedAt: new Date(),
-            };
-          }
-          return conv;
-        })
-      );
+      setConversations(prev => prev.map(conv => {
+        if (conv.id === targetConversationId) {
+          return {
+            ...conv,
+            messages: [...conv.messages, finalAssistantMessage],
+            updatedAt: new Date(),
+          };
+        }
+        return conv;
+      }));
 
       setStreamingMessage(null);
     } catch (error) {
@@ -170,7 +176,7 @@ function App() {
   };
 
   return (
-    <div className="h-screen flex bg-gray-900">
+    <div className="h-screen flex bg-gray-50 dark:bg-gray-900"> {/* Added dark:bg-gray-900 for dark mode potential */}
       <Sidebar
         conversations={conversations}
         currentConversationId={currentConversationId}
@@ -179,6 +185,7 @@ function App() {
         onDeleteConversation={handleDeleteConversation}
         onOpenSettings={() => setIsSettingsOpen(true)}
       />
+
       <ChatArea
         messages={currentConversation?.messages || []}
         onSendMessage={handleSendMessage}
@@ -186,6 +193,7 @@ function App() {
         streamingMessage={streamingMessage}
         hasApiKey={hasApiKey}
       />
+
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
