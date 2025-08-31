@@ -1,3 +1,4 @@
+// FILE: src/App.tsx
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ChatArea } from './components/ChatArea';
@@ -21,7 +22,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [streamingMessage, setStreamingMessage] = useState<Message | null>(null);
 
-  // Load data from localStorage on mount
   useEffect(() => {
     const savedConversations = storageUtils.getConversations();
     const savedSettings = storageUtils.getSettings();
@@ -32,12 +32,10 @@ function App() {
     if (savedConversations.length > 0) {
       setCurrentConversationId(savedConversations[0].id);
     }
-
-    // Update AI service with saved settings
+    
     aiService.updateSettings(savedSettings);
   }, []);
 
-  // Save conversations to localStorage when they change
   useEffect(() => {
     storageUtils.saveConversations(conversations);
   }, [conversations]);
@@ -53,7 +51,6 @@ function App() {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-
     setConversations(prev => [newConversation, ...prev]);
     setCurrentConversationId(newConversation.id);
   };
@@ -83,8 +80,6 @@ function App() {
     }
 
     let targetConversationId = currentConversationId;
-
-    // Create new conversation if none exists
     if (!targetConversationId) {
       const newConversation: Conversation = {
         id: generateId(),
@@ -105,7 +100,6 @@ function App() {
       timestamp: new Date(),
     };
 
-    // Update conversation with user message
     setConversations(prev => prev.map(conv => {
       if (conv.id === targetConversationId) {
         const updatedMessages = [...conv.messages, userMessage];
@@ -122,7 +116,6 @@ function App() {
     }));
 
     setIsLoading(true);
-
     try {
       const assistantMessage: Message = {
         id: generateId(),
@@ -130,7 +123,6 @@ function App() {
         role: 'assistant',
         timestamp: new Date(),
       };
-
       setStreamingMessage(assistantMessage);
 
       const conversationHistory = currentConversation 
@@ -148,7 +140,6 @@ function App() {
         setStreamingMessage(prev => prev ? { ...prev, content: fullResponse } : null);
       }
 
-      // Add final assistant message to conversation
       const finalAssistantMessage: Message = {
         ...assistantMessage,
         content: fullResponse,
@@ -175,7 +166,7 @@ function App() {
   };
 
   return (
-    <div className="h-screen flex bg-gray-50">
+    <div className="h-screen flex bg-gray-900 text-gray-100">
       <Sidebar
         conversations={conversations}
         currentConversationId={currentConversationId}
@@ -192,7 +183,7 @@ function App() {
         streamingMessage={streamingMessage}
         hasApiKey={hasApiKey}
       />
-
+      
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
