@@ -1,75 +1,89 @@
-/* FILE: src/index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Custom scrollbar styling */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(31, 41, 55, 0.5);
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(75, 85, 99, 0.5);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(107, 114, 128, 0.7);
-}
-
-/* prose styling for markdown */
-.prose {
-  color: #d1d5db;
-  max-width: none;
-}
-
-.prose h1, .prose h2, .prose h3 {
-  color: #f3f4f6;
-}
-
-.prose p {
-  color: #d1d5db;
-}
-
-.prose ul, .prose ol {
-  color: #d1d5db;
-}
-
-.prose code {
-  color: #d1d5db;
-  background-color: rgba(31, 41, 55, 0.5);
-}
-
-.prose pre {
-  background-color: rgba(31, 41, 55, 0.7);
-  color: #d1d5db;
-}
-
-.prose blockquote {
-  color: #9ca3af;
-  border-left-color: #4b5563;
-}
-
-.prose a {
-  color: #60a5fa;
-  text-decoration: none;
-}
-
-.prose a:hover {
-  text-decoration: underline;
-}
-
-/* Focus styles */
-*:focus {
-  outline: none;
-}
-
-/* Smooth transitions */
-* {
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+/* Custom styles */
+@layer components {
+  .prose {
+    color: #e5e7eb;
+    max-width: none;
+  }
+  
+  .prose p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+  
+  .prose strong {
+    color: #ffffff;
+  }
+  
+  .prose ul {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+  }
+  
+  .prose ol {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+  }
+  
+  .prose h1 {
+    color: #ffffff;
+    font-weight: 700;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .prose h2 {
+    color: #ffffff;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .prose h3 {
+    color: #ffffff;
+    font-weight: 600;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .prose code {
+    background-color: #1f2937;
+    color: #d1d5db;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+  }
+  
+  .prose pre {
+    background-color: #1f2937;
+    color: #d1d5db;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+  }
+  
+  .prose pre code {
+    background-color: transparent;
+    padding: 0;
+    font-size: 0.875rem;
+  }
+  
+  /* Button hover states */
+  .btn-primary:hover {
+    background-color: #2563eb;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #6b7280;
+  }
+  
+  /* Input focus states */
+  .input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  }
 }
