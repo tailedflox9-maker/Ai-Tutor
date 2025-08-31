@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Bot, User, Folder, Info, Share2 } from 'lucide-react';
+import { Bot } from 'lucide-react';
 import { MessageBubble } from './MessageBubble';
 import { ChatInput } from './ChatInput';
 import { Message } from '../types';
@@ -23,35 +23,31 @@ export function ChatArea({ messages, onSendMessage, isLoading, streamingMessage,
   const allMessages = streamingMessage ? [...messages, streamingMessage] : messages;
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[var(--color-chat-bg)]">
-      <div className="p-4 border-b border-[var(--color-border)] flex justify-between items-center">
-        <h1 className="text-lg font-medium">Hi</h1>
-        <div className="flex gap-2">
-          <button className="p-1 hover:bg-[var(--color-card)] rounded-md">
-            <Info className="w-4 h-4 text-[var(--color-text-secondary)]" />
-          </button>
-          <button className="p-1 hover:bg-[var(--color-card)] rounded-md">
-            <Share2 className="w-4 h-4 text-[var(--color-text-secondary)]" />
-          </button>
-        </div>
-      </div>
+    <div className="flex-1 flex flex-col h-full bg-[var(--color-bg)]">
       {allMessages.length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
-          <div className="text-center max-w-md p-8">
+          <div className="text-center max-w-md p-8 bg-[var(--color-card)] rounded-lg border border-[var(--color-border)]">
             <div className="w-16 h-16 bg-[var(--color-accent)]/10 rounded-full flex items-center justify-center mx-auto mb-6">
               <Bot className="w-8 h-8 text-[var(--color-accent)]" />
             </div>
-            <h2 className="text-2xl font-semibold mb-3">
+            <h2 className="text-2xl font-semibold text-[var(--color-text-primary)] mb-3">
               How can I help you today?
             </h2>
             <p className="text-[var(--color-text-secondary)] mb-6">
               I'm your AI tutor, ready to help you learn and answer any questions you might have.
             </p>
+            {!hasApiKey && (
+              <div className="bg-yellow-900/30 border border-yellow-900/50 rounded-lg p-4 text-left">
+                <p className="text-sm text-yellow-300">
+                  <strong>Setup Required:</strong> Please configure your API keys in Settings to start chatting.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto">
-          <div className="max-w-3xl mx-auto px-4 py-6">
+          <div className="max-w-3xl mx-auto px-4">
             {allMessages.map((message) => (
               <MessageBubble
                 key={message.id}
@@ -63,7 +59,7 @@ export function ChatArea({ messages, onSendMessage, isLoading, streamingMessage,
           <div ref={messagesEndRef} />
         </div>
       )}
-      <div className="border-t border-[var(--color-border)] bg-[var(--color-bg)]">
+      <div className="border-t border-[var(--color-border)]">
         <div className="max-w-3xl mx-auto px-4">
           <ChatInput
             onSendMessage={onSendMessage}
