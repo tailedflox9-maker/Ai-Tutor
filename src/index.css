@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --color-bg: #000000;
+    --color-sidebar: #0A0A0A;
+    --color-card: #1A1A1A;
+    --color-border: #2A2A2A;
+    --color-text-primary: #E5E5E5;
+    --color-text-secondary: #9CA3AF;
+    --color-text-placeholder: #6B7280;
+    --color-accent: #3B82F6;
+  }
+}
+
+body {
+  @apply bg-[var(--color-bg)] text-[var(--color-text-primary)];
+}
