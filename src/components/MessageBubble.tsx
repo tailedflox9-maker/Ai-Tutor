@@ -1,4 +1,3 @@
-// FILE: src/components/MessageBubble.tsx
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -15,7 +14,7 @@ interface MessageBubbleProps {
 export function MessageBubble({ message, isStreaming = false }: MessageBubbleProps) {
   const isUser = message.role === 'user';
   const [copied, setCopied] = React.useState(false);
-
+  
   const handleCopy = async () => {
     await navigator.clipboard.writeText(message.content);
     setCopied(true);
@@ -23,8 +22,8 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
   };
 
   return (
-    <div className={`py-6 ${isUser ? '' : 'bg-gray-800/30'}`}>
-      <div className="flex gap-4 max-w-full">
+    <div className={`group py-4 ${isUser ? 'mb-4' : 'mb-6'}`}>
+      <div className="flex gap-3 max-w-full">
         <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
           isUser ? 'bg-blue-600' : 'bg-gray-700'
         }`}>
@@ -43,11 +42,11 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
             {!isUser && (
               <button
                 onClick={handleCopy}
-                className="opacity-0 group-hover:opacity-100 p-1 text-gray-500 hover:text-gray-300 transition-all"
+                className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-gray-300 transition-all"
                 title="Copy message"
               >
                 {copied ? (
-                  <Check className="w-3 h-3 text-green-500" />
+                  <Check className="w-3 h-3 text-green-400" />
                 ) : (
                   <Copy className="w-3 h-3" />
                 )}
@@ -55,11 +54,11 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
             )}
           </div>
           
-          <div className="prose prose-sm max-w-none prose-invert">
+          <div className="prose prose-sm max-w-none">
             {isUser ? (
-              <p className="text-gray-300 whitespace-pre-wrap m-0">{message.content}</p>
+              <p className="text-gray-200 whitespace-pre-wrap m-0">{message.content}</p>
             ) : (
-              <div className="text-gray-300">
+              <div className="text-gray-200">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
@@ -73,7 +72,8 @@ export function MessageBubble({ message, isStreaming = false }: MessageBubblePro
                           className="rounded-md !mt-2 !mb-2"
                           {...props}
                         >
-                          {String(children).replace(/\n$/, '')}
+                          {String(children).replace(/
+$/, '')}
                         </SyntaxHighlighter>
                       ) : (
                         <code className="bg-gray-800 px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
