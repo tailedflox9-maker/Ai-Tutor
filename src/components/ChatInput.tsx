@@ -43,7 +43,7 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
           onKeyDown={handleKeyDown}
           placeholder={disabled ? "Please configure API keys in Settings first..." : "Send a message..."}
           disabled={disabled || isLoading}
-          className="w-full min-h-[52px] max-h-[200px] p-4 pr-12 border border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500 shadow-sm"
+          className="w-full min-h-[52px] max-h-[200px] p-4 pr-12 border border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500 shadow-sm font-[var(--font-weight)] text-black"
           rows={1}
         />
         <button
@@ -58,7 +58,7 @@ export function ChatInput({ onSendMessage, isLoading, disabled = false }: ChatIn
           )}
         </button>
       </form>
-      
+
       {disabled && (
         <p className="text-xs text-gray-500 mt-2 text-center">
           Configure your API keys in Settings to start chatting
