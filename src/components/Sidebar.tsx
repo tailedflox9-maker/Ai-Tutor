@@ -20,28 +20,25 @@ export function Sidebar({
   onOpenSettings,
 }: SidebarProps) {
   return (
-    <div className="w-64 bg-gray-900 flex flex-col h-full">
-      {/* Header */}
-      <div className="p-4 border-b border-gray-700">
+    <div className="w-64 bg-[var(--color-sidebar)] flex flex-col h-full border-r border-[var(--color-border)]">
+      <div className="p-4 border-b border-[var(--color-border)]">
         <div className="flex items-center gap-2 mb-4">
-          <Bot className="w-6 h-6 text-blue-400" />
-          <h1 className="text-lg font-semibold text-white">AI Tutor</h1>
+          <Bot className="w-6 h-6 text-[var(--color-accent)]" />
+          <h1 className="text-lg font-semibold text-[var(--color-text-primary)]">AI Tutor</h1>
         </div>
         <button
           onClick={onNewConversation}
-          className="w-full flex items-center gap-2 px-3 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors text-white border border-gray-600"
+          className="w-full flex items-center gap-2 px-3 py-2 bg-[var(--color-card)] hover:bg-gray-800 rounded-lg transition-colors text-[var(--color-text-primary)] border border-[var(--color-border)]"
         >
           <Plus className="w-4 h-4" />
           New chat
         </button>
       </div>
-
-      {/* Conversations */}
       <div className="flex-1 overflow-y-auto">
         <div className="p-2">
           {conversations.length === 0 ? (
-            <div className="text-center text-gray-500 mt-8 px-4">
-              <MessageSquare className="w-8 h-8 mx-auto mb-2 text-gray-600" />
+            <div className="text-center text-[var(--color-text-secondary)] mt-8 px-4">
+              <MessageSquare className="w-8 h-8 mx-auto mb-2 text-[var(--color-text-secondary)]" />
               <p className="text-sm">No conversations yet</p>
             </div>
           ) : (
@@ -51,13 +48,13 @@ export function Sidebar({
                   key={conversation.id}
                   className={`group flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors ${
                     currentConversationId === conversation.id
-                      ? 'bg-gray-800'
-                      : 'hover:bg-gray-800'
+                      ? 'bg-[var(--color-card)]'
+                      : 'hover:bg-[var(--color-card)]'
                   }`}
                   onClick={() => onSelectConversation(conversation.id)}
                 >
-                  <MessageSquare className="w-4 h-4 flex-shrink-0 text-gray-400" />
-                  <span className="flex-1 text-sm text-gray-300 truncate">
+                  <MessageSquare className="w-4 h-4 flex-shrink-0 text-[var(--color-text-secondary)]" />
+                  <span className="flex-1 text-sm text-[var(--color-text-primary)] truncate">
                     {conversation.title}
                   </span>
                   <button
@@ -67,7 +64,7 @@ export function Sidebar({
                     }}
                     className="opacity-0 group-hover:opacity-100 p-1 hover:text-red-400 transition-all"
                   >
-                    <Trash2 className="w-3 h-3" />
+                    <Trash2 className="w-3 h-3 text-[var(--color-text-secondary)]" />
                   </button>
                 </div>
               ))}
@@ -75,12 +72,10 @@ export function Sidebar({
           )}
         </div>
       </div>
-
-      {/* Settings */}
-      <div className="p-4 border-t border-gray-700">
+      <div className="p-4 border-t border-[var(--color-border)]">
         <button
           onClick={onOpenSettings}
-          className="w-full flex items-center gap-2 px-3 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition-colors"
+          className="w-full flex items-center gap-2 px-3 py-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-card)] rounded-lg transition-colors"
         >
           <Settings className="w-4 h-4" />
           Settings
