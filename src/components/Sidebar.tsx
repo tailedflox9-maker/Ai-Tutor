@@ -1,5 +1,6 @@
+// FILE: src/components/Sidebar.tsx
 import React from 'react';
-import { Plus, MessageSquare, Settings, Trash2, Bot } from 'lucide-react';
+import { Plus, Search, MessageSquare, Settings, Trash2, Bot } from 'lucide-react';
 import { Conversation } from '../types';
 
 interface SidebarProps {
@@ -20,20 +21,31 @@ export function Sidebar({
   onOpenSettings,
 }: SidebarProps) {
   return (
-    <div className="w-64 bg-gray-900 flex flex-col h-full">
+    <div className="w-64 bg-gray-900 border-r border-gray-800 flex flex-col h-full">
       {/* Header */}
-      <div className="p-4 border-b border-gray-700">
-        <div className="flex items-center gap-2 mb-4">
-          <Bot className="w-6 h-6 text-blue-400" />
-          <h1 className="text-lg font-semibold text-white">AI Tutor</h1>
+      <div className="p-4 border-b border-gray-800">
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-sm font-semibold text-gray-300">Home Workspace</h1>
         </div>
         <button
           onClick={onNewConversation}
-          className="w-full flex items-center gap-2 px-3 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors text-white border border-gray-600"
+          className="w-full flex items-center gap-2 px-3 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors text-gray-200 text-sm"
         >
           <Plus className="w-4 h-4" />
           New chat
         </button>
+      </div>
+
+      {/* Search */}
+      <div className="p-3 border-b border-gray-800">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
+          <input
+            type="text"
+            placeholder="Search chats..."
+            className="w-full pl-10 pr-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+        </div>
       </div>
 
       {/* Conversations */}
@@ -41,8 +53,7 @@ export function Sidebar({
         <div className="p-2">
           {conversations.length === 0 ? (
             <div className="text-center text-gray-500 mt-8 px-4">
-              <MessageSquare className="w-8 h-8 mx-auto mb-2 text-gray-600" />
-              <p className="text-sm">No conversations yet</p>
+              <p className="text-sm">No chats.</p>
             </div>
           ) : (
             <div className="space-y-1">
@@ -77,10 +88,10 @@ export function Sidebar({
       </div>
 
       {/* Settings */}
-      <div className="p-4 border-t border-gray-700">
+      <div className="p-3 border-t border-gray-800">
         <button
           onClick={onOpenSettings}
-          className="w-full flex items-center gap-2 px-3 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition-colors"
+          className="w-full flex items-center gap-2 px-3 py-2 text-gray-400 hover:bg-gray-800 rounded-lg transition-colors text-sm"
         >
           <Settings className="w-4 h-4" />
           Settings
